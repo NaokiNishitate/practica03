@@ -8,6 +8,10 @@ import Joi from 'joi';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+interface CustomError extends Error {
+  status?: number;
+}
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -124,9 +128,9 @@ app.delete('/api/products/:id', async (req: Request, res: Response, next: NextFu
 });
 
 // Manejo de errores
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
+app.use((err: CustomError, req: Request, res: Response) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({ error: 'Something went wrong!' });
 });
 
 // Iniciar servidor

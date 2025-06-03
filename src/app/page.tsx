@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiShoppingCart, FiTrash2, FiPlus, FiMinus, FiLoader } from 'react-icons/fi';
-import { FaCartPlus, FaTrash } from 'react-icons/fa';
+import { FaCartPlus } from 'react-icons/fa';
 
 interface Product {
   id: number;

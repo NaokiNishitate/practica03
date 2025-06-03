@@ -1,5 +1,10 @@
 import mysql from 'mysql2/promise';
 
+interface MySQLResult {
+  affectedRows: number;
+  insertId: number;
+}
+
 // Configuración de la conexión a MySQL
 const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
@@ -12,15 +17,18 @@ const pool = mysql.createPool({
 });
 
 // Función para ejecutar consultas
-export async function query<T>(sql: string, params?: any[]): Promise<T[]> {
-    const [rows] = await pool.query<T[]>(sql, params);
-    return Array.isArray(rows) ? rows : [];
+export async function query<T>(
+  sql: string, 
+  params?: (string | number | boolean | null)[]
+): Promise<T[]> {
+  const [rows] = await pool.query<T[]>(sql, params);
+  return Array.isArray(rows) ? rows : [];
 }
 
 // Inicializar la base de datos (tabla products)
 export async function initDB() {
     try {
-        await query(`
+        await query<MySQLResult>(`
       CREATE TABLE IF NOT EXISTS products (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,

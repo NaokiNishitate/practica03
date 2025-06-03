@@ -1,61 +1,63 @@
-import { NextResponse } from "next/server";
-import mysql from 'mysql2/promise';
+import { NextResponse } from 'next/server';
+import { query } from '@/lib/database';
+import { productSchema } from '@/lib/validation';
+import { logRequest } from '@/lib/middleware';
+import type { Product } from '@/types/products';
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'ecommerce_db',
-});
-
+// GET - Listar todos los productos
 export async function GET() {
-    try {
-        const connection = await pool.getConnection();
-        const [rows] = await connection.query('SELECT * FROM products');
-        connection.release();
-        return NextResponse.json(rows);
-    } catch (error) {
-        return NextResponse.json(
-            { error: 'Failed to fetch products' },
-            { status: 500 }
-        );
-    }
+  try {
+    const products = await query<Product>('SELECT * FROM products');
+    return NextResponse.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch products' },
+      { status: 500 }
+    );
+  }
 }
 
+// POST - Crear nuevo producto
 export async function POST(request: Request) {
-    try {
-        const body = await request.json();
+  try {
+    const body = await request.json();
+    logRequest(new Request(request.url, { method: 'POST' }));
 
-        // Validación básica
-        if (!body.name || !body.description || !body.price || !body.stock) {
-            return NextResponse.json(
-                { error: 'Missing required fields' },
-                { status: 400 }
-            );
-        }
-
-        // Obtener imagen de API externa
-        const imageResponse = await fetch('https://picsum.photos/400/300');
-        const imageUrl = imageResponse.url;
-
-        const connection = await pool.getConnection();
-        const [result] = await connection.query(
-            'INSERT INTO products (name, description, price, stock, image_url) VALUES (?, ?, ?, ?, ?)',
-            [body.name, body.description, body.price, body.stock, imageUrl]
-        );
-
-        const newProduct = {
-            id: (result as any).insertId,
-            ...body,
-            image_url: imageUrl
-        };
-
-        connection.release();
-        return NextResponse.json(newProduct, { status: 201 });
-    } catch (error) {
-        return NextResponse.json(
-            { error: 'Failed to create product' },
-            { status: 500 }
-        );
+    // Validación con Joi
+    const { error, value } = productSchema.validate(body);
+    if (error) {
+      return NextResponse.json(
+        { error: error.details[0].message },
+        { status: 400 }
+      );
     }
+
+    // Obtener imagen de API externa (Picsum)
+    const imageResponse = await fetch('https://picsum.photos/400/300');
+    if (!imageResponse.ok) {
+      throw new Error('Failed to fetch image from external API');
+    }
+    const imageUrl = imageResponse.url;
+
+    // Insertar en la base de datos
+    const result = await query<{ insertId: number }>(
+      'INSERT INTO products (name, description, price, stock, image_url) VALUES (?, ?, ?, ?, ?)',
+      [value.name, value.description, value.price, value.stock, imageUrl]
+    );
+
+    // Obtener el producto recién creado
+    const [newProduct] = await query<Product>(
+      'SELECT * FROM products WHERE id = ?',
+      [result[0].insertId]
+    );
+
+    return NextResponse.json(newProduct, { status: 201 });
+  } catch (error) {
+    console.error('Error creating product:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

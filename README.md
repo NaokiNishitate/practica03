@@ -1,20 +1,29 @@
-# E-commerce System with Express.js and MySQL
+# E-commerce con Express.js y MySQL
 
-A basic e-commerce system with product management and external API integration for product images.
+Solución completa para tiendas online con carrito de compras y gestión de productos.
 
-## Features
+## Características Principales
 
-- CRUD operations for products
-- Automatic image fetching from external API
-- MySQL database integration
-- TypeScript support
-- Input validation with Joi
-- Error handling middleware
-- Request logging
+- 🚀 CRUD completo de productos
+- 🛒 Carrito de compras en tiempo real
+- 🖼️ Imágenes automáticas desde APIs externas
+- 🔐 Validación de datos con Joi
+- 📊 Base de datos MySQL/PostgreSQL
+- ✨ Desplegado en Render
 
-## Local Installation
+## Demo en Vivo
 
-1. Clone the repository:
+[Ver demo en producción](https://tu-app.onrender.com)
+
+## Instalación Local
+
+### Requisitos
+- Node.js 18+
+- MySQL 8.0+ o PostgreSQL
+- Git
+
+### Pasos:
+1. Clona el repositorio:
    ```bash
-   git clone https://github.com/yourusername/ecommerce-express.git
+   git clone https://github.com/tu-usuario/ecommerce-express.git
    cd ecommerce-express

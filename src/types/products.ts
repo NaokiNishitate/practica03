@@ -5,8 +5,6 @@ export interface Product {
   price: number;
   stock: number;
   image_url: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface CartItem extends Product {

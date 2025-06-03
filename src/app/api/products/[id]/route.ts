@@ -2,20 +2,16 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/database';
 import { productSchema } from '@/lib/validation';
 import { logRequest } from '@/lib/middleware';
+import type { NextRequest } from 'next/server';
 import type { Product } from '@/types/products';
 
-// Tipos para los parámetros de ruta
-interface RouteParams {
-    params: {
-        id: string;
-    };
-}
-
 // GET - Obtener producto por ID
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(
+    request: NextRequest,
+    { params }: { params: { id: string } }
+) {
     try {
-        logRequest(new Request(request.url, { method: 'GET' }));
-
+        logRequest(request);
         const productId = parseInt(params.id);
 
         if (isNaN(productId)) {
@@ -48,10 +44,12 @@ export async function GET(request: Request, { params }: RouteParams) {
 }
 
 // PUT - Actualizar producto
-export async function PUT(request: Request, { params }: RouteParams) {
+export async function PUT(
+    request: NextRequest,
+    { params }: { params: { id: string } }
+) {
     try {
-        logRequest(new Request(request.url, { method: 'PUT' }));
-
+        logRequest(request);
         const productId = parseInt(params.id);
         const body = await request.json();
 
@@ -107,10 +105,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
 }
 
 // DELETE - Eliminar producto
-export async function DELETE(request: Request, { params }: RouteParams) {
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: { id: string } }
+) {
     try {
-        logRequest(new Request(request.url, { method: 'DELETE' }));
-
+        logRequest(request);
         const productId = parseInt(params.id);
 
         if (isNaN(productId)) {

@@ -317,14 +317,13 @@ export default function Home() {
                     key={product.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    whileHover={{ y: -5 }}
-                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition"
+                    transition={{ delay: index * 0.1 }}
+                    className="bg-white p-4 rounded-xl shadow-md flex flex-col"
                   >
                     <img
-                      src={product.image_url}
+                      src={product.image_url || 'https://via.placeholder.com/150'}
                       alt={product.name}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-40 object-cover rounded-lg mb-4"
                     />
                     <div className="p-4">
                       <h3 className="font-bold text-lg mb-1">{product.name}</h3>
